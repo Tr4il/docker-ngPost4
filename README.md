@@ -10,7 +10,7 @@ I'm only the script-kiddie who modified it for his own needs :).
 
 <img align="left" width="80" height="80" src="https://raw.githubusercontent.com/mbruel/ngPost/master/src/resources/icons/ngPost.png" alt="ngPost">
 
-# ngPost v4.7
+# ngPost v4.16
 
 ngPost is a convenient unified client to post files to usenet.
 

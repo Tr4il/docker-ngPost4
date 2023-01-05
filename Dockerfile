@@ -1,20 +1,22 @@
 #
-# mediainfo Dockerfile
-#
-# https://github.com/jlesage/docker-mediainfo
-#
+
 
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.12-glibc-v3.5.7
+# FROM jlesage/baseimage-gui:alpine-3.12-glibc-v3.5.7
+FROM jlesage/baseimage-gui:alpine-3.15-glibc-v3
+# FROM jlesage/baseimage-gui:alpine-3.17-v4
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
 
 # Define software versions.
-ARG NGPOST_VERSION=4.15
+ARG NGPOST_VERSION=4.16
 
 # Define software download URLs.
-ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/v${NGPOST_VERSION}.tar.gz
+ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
+
+# Install glibc according to instructions
+# RUN install-glibc
 
 # Define working directory.
 WORKDIR /tmp
@@ -24,15 +26,16 @@ RUN add-pkg \
         curl \
         qt5-qtsvg \
         qt5-qtbase-dev \
-        libssl1.1 \
-        libressl-dev \
+#        libssl1.1 \
+#        libressl-dev \
         build-base \
         nodejs-current \
         npm \
         git \
         wget \
-        python2-dev \
-        bash
+#        python2-dev \
+        bash \
+        tar
 
 # Compile and install ngPost.
 
@@ -51,15 +54,18 @@ RUN \
     rm -rf /tmp/* /tmp/.[!.]*
 
 # Install 7z (not p7zip)
+# new: https://7-zip.org/a/7z2201-linux-x64.tar.xz
+# old: https://www.7-zip.org/a/7z2103-linux-x64.tar.xz
 
-RUN \
-    mkdir /temp && cd /temp && \
-    wget https://www.7-zip.org/a/7z2103-linux-x64.tar.xz -o 7z.tar.xz && \
-    tar -xzf 7z.tar.xz && \
-    cp 7zz /usr/bin/7z && \
-    cd && \
-    rm -rf /temp/* /temp/.[!.]*
+#RUN \
+#    mkdir /temp && cd /temp && \
+#    wget https://7-zip.org/a/7z2201-linux-x64.tar.xz && \
+#    tar xvf 7z2201-linux-x64.tar.xz && \
+#   cp 7zz /usr/bin/7z && \
+#    cd && \
+#    rm -rf /temp/* /temp/.[!.]*
 
+COPY 7zip/7zz /usr/bin/7z
 
 # Compile and install ParPar.
 
@@ -89,4 +95,4 @@ LABEL \
       org.label-schema.description="Docker container for ngPost" \
       org.label-schema.version="$DOCKER_IMAGE_VERSION" \
       org.label-schema.vcs-url="https://github.com/Tr4il/docker-ngPost" \
-      org.label-schema.schema-version="4.8"
+      org.label-schema.schema-version="4.16"
