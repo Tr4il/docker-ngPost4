@@ -1,10 +1,5 @@
-#
-
-
 # Pull base image.
-# FROM jlesage/baseimage-gui:alpine-3.12-glibc-v3.5.7
-FROM jlesage/baseimage-gui:alpine-3.15-glibc-v3
-# FROM jlesage/baseimage-gui:alpine-3.17-v4
+FROM jlesage/baseimage-gui:debian-11-v4
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
@@ -15,27 +10,28 @@ ARG NGPOST_VERSION=4.16
 # Define software download URLs.
 ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
 
-# Install glibc according to instructions
-# RUN install-glibc
-
 # Define working directory.
 WORKDIR /tmp
 
 # Install dependencies.
-RUN add-pkg \
+RUN sed -i 's/main$/main non-free/' /etc/apt/sources.list
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
         curl \
-        qt5-qtsvg \
-        qt5-qtbase-dev \
-#        libssl1.1 \
-#        libressl-dev \
-        build-base \
-        nodejs-current \
+        qtbase5-dev \
+        qtchooser \
+        qt5-qmake \
+        qtbase5-dev-tools \
+        rar \
+        build-essential \
+        ca-certificates \
+        nodejs \
         npm \
         git \
         wget \
-#        python2-dev \
         bash \
-        tar
+        tar \
+        && rm -rf /var/lib/apt/lists/*
 
 # Compile and install ngPost.
 
@@ -46,8 +42,8 @@ RUN \
     curl -# -L ${NGPOST_URL} | tar xz --strip 1 -C ngPost && \
     # Compile.
     cd ngPost/src && \
-    /usr/lib/qt5/bin/qmake && \
-    make && \
+    qmake && \
+    make -j$(nproc) && \
     cp ngPost /usr/bin/ngPost && \
     cd && \
     # Cleanup.
