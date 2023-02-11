@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         qtchooser \
         qt5-qmake \
         qtbase5-dev-tools \
-        rar \
         build-essential \
         ca-certificates \
         nodejs \
