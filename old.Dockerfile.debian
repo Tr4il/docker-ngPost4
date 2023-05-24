@@ -1,5 +1,5 @@
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.17-v4
+FROM jlesage/baseimage-gui:debian-11-v4
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
@@ -8,31 +8,31 @@ ARG DOCKER_IMAGE_VERSION=unknown
 ARG NGPOST_VERSION=4.16
 
 # Define software download URLs.
-ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
-
-# Install glibc according to instructions
-RUN install-glibc
+ ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
 
 # Define working directory.
 WORKDIR /tmp
 
 # Install dependencies.
-RUN add-pkg \
+RUN sed -i 's/main$/main non-free/' /etc/apt/sources.list
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
         curl \
-        qt5-qtsvg \
-        qt5-qtbase-dev \
-        build-base \
-        nodejs-current \
+        qtbase5-dev \
+        qtchooser \
+        qt5-qmake \
+        qtbase5-dev-tools \
+        build-essential \
+        ca-certificates \
+        nodejs \
         npm \
         git \
         wget \
         bash \
         tar \
-        libc6-compat \
-        libstdc++
+        && rm -rf /var/lib/apt/lists/*
 
 # Compile and install ngPost.
-
 RUN \
     # Download sources for ngPost.
     echo "Downloading ngPost package..." && \
@@ -40,29 +40,24 @@ RUN \
     curl -# -L ${NGPOST_URL} | tar xz --strip 1 -C ngPost && \
     # Compile.
     cd ngPost/src && \
-    /usr/lib/qt5/bin/qmake && \
-    make && \
+    qmake && \
+    make -j$(nproc) && \
     cp ngPost /usr/bin/ngPost && \
     cd && \
     # Cleanup.
     rm -rf /tmp/* /tmp/.[!.]*
 
 # Install 7z (not p7zip)
-# new: https://7-zip.org/a/7z2201-linux-x64.tar.xz
-# old: https://www.7-zip.org/a/7z2103-linux-x64.tar.xz
-
-#RUN \
-#    mkdir /temp && cd /temp && \
-#    wget https://7-zip.org/a/7z2201-linux-x64.tar.xz && \
-#    tar xvf 7z2201-linux-x64.tar.xz && \
-#   cp 7zz /usr/bin/7z && \
-#    cd && \
-#    rm -rf /temp/* /temp/.[!.]*
-
-COPY 7zip/7zz /usr/bin/7z
+RUN \
+    mkdir /temp && cd /temp && \
+    wget https://7-zip.org/a/7z2300-linux-x64.tar.xz && \
+    tar xvf 7z2300-linux-x64.tar.xz && \
+    cp 7zzs /usr/bin/7z && \
+    chmod +x /usr/bin/7z && \
+    cd && \
+    rm -rf /temp/* /temp/.[!.]*
 
 # Compile and install ParPar.
-
 RUN \
     # Download sources for parpar
     echo "Downloading & Installing ParPar" && \
