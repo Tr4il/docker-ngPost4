@@ -4,16 +4,6 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.18 as buildstage
 # set 7zip version
 ENV SEVENZIPVERSION=2301
 
-# Docker image version is provided via build arg.
-ARG DOCKER_IMAGE_VERSION=unknown
-
-# Define software versions.
-ARG NGPOST_VERSION=4.16
-
-# Define software download URLs.
-# ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
-ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
-
 RUN \
   echo "**** install build packages ****" && \
   apk add --no-cache \
@@ -55,6 +45,16 @@ RUN \
   
 # Pull base image.
 FROM jlesage/baseimage-gui:alpine-3.18-v4
+
+# Docker image version is provided via build arg.
+ARG DOCKER_IMAGE_VERSION=unknown
+
+# Define software versions.
+ARG NGPOST_VERSION=4.16
+
+# Define software download URLs.
+# ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
+ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
 
 # Install glibc according to instructions
 RUN install-glibc
