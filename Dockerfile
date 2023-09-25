@@ -11,6 +11,9 @@ ARG NGPOST_VERSION=4.16
 # ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
 ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
 
+# set 7zip version
+ARG SEVENZIPVERSION=2301
+
 # Install glibc according to instructions
 RUN install-glibc
 
