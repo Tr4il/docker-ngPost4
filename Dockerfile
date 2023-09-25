@@ -98,17 +98,7 @@ RUN \
     rm -rf /tmp/* /tmp/.[!.]*
 
 RUN \
-    mkdir /temp && cd /temp && \
-    mkdir ParPar && \
-    curl -# -L https://github.com/animetosho/ParPar/tarball/master | tar xz --strip 1 -C ParPar && \
-    cd ParPar && \
-    npm install -g node-gyp --unsafe-perm && \
-    node-gyp rebuild && \
-    npm install && \
-    ln -s /temp/ParPar/bin/parpar.js /usr/bin/parpar && \
-    cd && \
-    # Cleanup.
-    rm -rf /temp/* /temp/.[!.]*
+    npm install -g @animetosho/parpar
 
 # Generate and install favicons.
 RUN \
