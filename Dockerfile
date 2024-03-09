@@ -1,5 +1,5 @@
 # Buildstage
-FROM ghcr.io/linuxserver/baseimage-alpine:3.18 as buildstage
+FROM ghcr.io/linuxserver/baseimage-alpine:3.19 as buildstage
 
 # set 7zip version
 ENV SEVENZIPVERSION=2301
@@ -7,27 +7,21 @@ ENV SEVENZIPVERSION=2301
 RUN \
   echo "**** install build packages ****" && \
   apk add --no-cache \
-    alpine-sdk \
-    autoconf \
-    automake \
-    build-base \
-    clang14 \
-    clang14-dev \
-    g++ \
-    gcc \
-    git \
-    libarchive-tools \
-    libcap-dev \
-    libxml2-dev \
-    libxslt-dev \
-    lld \
-    llvm14 \
-    make \
-    musl-dev \
-    ncurses-dev \
-    openssl-dev \
-    patch \
-    xz
+  alpine-sdk \
+  git \
+  patch \
+  wget \
+  clang14 \
+  make \
+  build-base \
+  musl-dev \
+  clang14-dev \
+  gcc \
+  lld \
+  llvm14 \
+  curl \
+  libarchive-tools \
+  xz
 
 RUN \
   echo "**** build 7zip ****" && \
@@ -44,17 +38,18 @@ RUN \
   mv /usr/local/src/7z${SEVENZIPVERSION}/CPP/7zip/Bundles/Alone2/b/c_x64/7zz /usr/local/bin/7zz
   
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.18-v4
+FROM jlesage/baseimage-gui:alpine-3.19-v4
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
 
 # Define software versions.
-ARG NGPOST_VERSION=4.16
+ARG NGPOST_VERSION=4.17
 
 # Define software download URLs.
 # ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
-ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
+# ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
+ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/obfuscation-fix
 
 # Install glibc according to instructions
 RUN install-glibc
@@ -122,4 +117,4 @@ LABEL \
       org.label-schema.description="Docker container for ngPost" \
       org.label-schema.version="$DOCKER_IMAGE_VERSION" \
       org.label-schema.vcs-url="https://github.com/Tr4il/docker-ngPost" \
-      org.label-schema.schema-version="4.16"
+      org.label-schema.schema-version="4.17"
