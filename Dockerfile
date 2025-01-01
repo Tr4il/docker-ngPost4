@@ -1,44 +1,5 @@
-# Buildstage
-FROM ghcr.io/linuxserver/baseimage-alpine:3.19 as buildstage
-
-# set 7zip version
-ENV SEVENZIPVERSION=2301
-
-RUN \
-  echo "**** install build packages ****" && \
-  apk add --no-cache \
-  alpine-sdk \
-  git \
-  patch \
-  wget \
-  clang14 \
-  make \
-  build-base \
-  musl-dev \
-  clang14-dev \
-  gcc \
-  lld \
-  llvm14 \
-  curl \
-  libarchive-tools \
-  xz
-
-RUN \
-  echo "**** build 7zip ****" && \
-  ln -s /usr/bin/clang-14 /usr/local/bin/clang && \
-  ln -s /usr/bin/clang++-14 /usr/local/bin/clang++ && \
-  mkdir /usr/local/src && cd /usr/local/src && git clone --branch v2.56.2 https://github.com/Terraspace/UASM.git && \
-  cd /usr/local/src/UASM && make CC="clang -fcommon -static -std=gnu99 -Wno-error=int-conversion" -f gccLinux64.mak && \
-  cp /usr/local/src/UASM/GccUnixR/uasm /usr/local/bin/uasm && \
-  curl -o /tmp/7z${SEVENZIPVERSION}-src.tar.xz "https://www.7-zip.org/a/7z${SEVENZIPVERSION}-src.tar.xz" && \
-  mkdir /usr/local/src/7z${SEVENZIPVERSION} && cd /usr/local/src/7z${SEVENZIPVERSION} && tar -xf /tmp/7z${SEVENZIPVERSION}-src.tar.xz && \
-  cd /usr/local/src/7z${SEVENZIPVERSION} && sed -i -e '1i\OPTION FRAMEPRESERVEFLAGS:ON\nOPTION PROLOGUE:NONE\nOPTION EPILOGUE:NONE' Asm/x86/7zAsm.asm && \
-  cd /usr/local/src/7z${SEVENZIPVERSION}/CPP/7zip/Bundles/Alone2 && make CFLAGS_BASE_LIST="-c -static -D_7ZIP_AFFINITY_DISABLE=1 -DZ7_AFFINITY_DISABLE=1 -D_GNU_SOURCE=1" MY_ASM=uasm MY_ARCH="-static" CFLAGS_WARN_WALL="-Wall -Wextra" -f ../../cmpl_clang_x64.mak && \
-  strip /usr/local/src/7z${SEVENZIPVERSION}/CPP/7zip/Bundles/Alone2/b/c_x64/7zz && \
-  mv /usr/local/src/7z${SEVENZIPVERSION}/CPP/7zip/Bundles/Alone2/b/c_x64/7zz /usr/local/bin/7zz
-  
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.19-v4
+FROM jlesage/baseimage-gui:alpine-3.21-v4
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
@@ -50,9 +11,6 @@ ARG NGPOST_VERSION=4.17
 # ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
 # ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
 ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/obfuscation-fix
-
-# Install glibc according to instructions
-RUN install-glibc
 
 # Define working directory.
 WORKDIR /tmp
@@ -75,6 +33,8 @@ RUN add-pkg \
         ttf-freefont \
         font-noto \
         terminus-font \ 
+        gcompat \
+        7zip \
      && fc-cache -f
 
 # Compile and install ngPost.
@@ -101,7 +61,6 @@ RUN \
     install_app_icon.sh "$APP_ICON_URL"
 
 # Add files.
-COPY --from=buildstage /usr/local/bin/7zz /usr/bin/7z
 COPY rootfs/ /
 
 # Set environment variables.
