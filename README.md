@@ -1,5 +1,5 @@
 # Docker container for ngPost
-This is a Docker container for [ngPost](https://github.com/mbruel/ngPost).
+This is a Docker container for [disinclination/ngPost](https://github.com/disinclination/ngPost) (Originally by [Mathieu Mbruel](https://github.com/mbruel/ngPost)).
 
 The GUI of the application is accessed through a modern web browser (no installation or configuration needed on client side) or via any VNC client.
 
