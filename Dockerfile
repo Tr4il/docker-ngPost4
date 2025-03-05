@@ -5,12 +5,12 @@ FROM jlesage/baseimage-gui:alpine-3.21-v4
 ARG DOCKER_IMAGE_VERSION=unknown
 
 # Define software versions.
-ARG NGPOST_VERSION=4.17
+ARG NGPOST_VERSION=5.0.0
 
 # Define software download URLs.
 # ARG NGPOST_URL=https://github.com/mbruel/ngPost/archive/refs/tags/v${NGPOST_VERSION}.tar.gz
 # ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/alpine-fix
-ARG NGPOST_URL=https://github.com/Tr4il/ngPost/tarball/obfuscation-fix
+ARG NGPOST_URL=https://github.com/disinclination/ngPost/archive/refs/tags/${NGPOST_VERSION}.tar.gz
 
 # Define working directory.
 WORKDIR /tmp
@@ -18,8 +18,8 @@ WORKDIR /tmp
 # Install dependencies.
 RUN add-pkg \
         curl \
-        qt5-qtsvg \
-        qt5-qtbase-dev \
+        qt6-qtsvg \
+        qt6-qtbase-dev \
         build-base \
         nodejs \
         npm \
@@ -45,7 +45,7 @@ RUN \
     curl -# -L ${NGPOST_URL} | tar xz --strip 1 -C ngPost && \
     # Compile.
     cd ngPost/src && \
-    /usr/lib/qt5/bin/qmake ngPost.pro -o Makefile && \
+    /usr/bin/qmake6 ngPost.pro && \
     make && \
     cp ngPost /usr/bin/ngPost && \
     cd && \
@@ -75,5 +75,5 @@ LABEL \
       org.label-schema.name="ngPost" \
       org.label-schema.description="Docker container for ngPost" \
       org.label-schema.version="$DOCKER_IMAGE_VERSION" \
-      org.label-schema.vcs-url="https://github.com/Tr4il/docker-ngPost" \
-      org.label-schema.schema-version="4.17"
+      org.label-schema.vcs-url="https://github.com/Tr4il/docker-ngPost4" \
+      org.label-schema.schema-version="5.0.0"
